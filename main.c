@@ -26,19 +26,29 @@ int main()
 	int status = 0;
 	int ppid= 0;
 	char c;
+	int backrun = FALSE;
 	while(should_run)
 	{
+		backrun = FALSE;
 		int idx = 0;
-		int i = 0;
 		printf("\e[34;40m simpleshell> \e[0m");
 		fflush(stdout);
 		fgets(line, MAXLINE, stdin);
 		line[strlen(line)-1] = '\0';
 		GetArgs(args, line);
 		pid = fork();
+		if(strlen(args[0]) == 0) 
+		{
+			continue;
+		}
 		CHKERR(pid ,"Create child Filed :");
-
-
+		while(args[idx] != NULL)
+		{
+			if(strcmp(args[idx] ,"&") == 0)
+				backrun = TRUE;
+			idx++;
+		}
+		
 		if(pid == 0)//Child process
 		{
 			
@@ -47,7 +57,8 @@ int main()
 		}
 		else
 		{
-			wait(&status);
+			int i = 0;
+			if(backrun == FALSE) wait(&status);
 		}
 	}
 }
